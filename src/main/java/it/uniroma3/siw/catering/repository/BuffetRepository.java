@@ -1,19 +1,18 @@
 package it.uniroma3.siw.catering.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import it.uniroma3.siw.catering.model.Buffet;
 import it.uniroma3.siw.catering.model.Chef;
 
-@Repository
 public interface BuffetRepository extends CrudRepository<Buffet, Long> {
-	Buffet findByName(String name);
+	
+	public boolean existsByNome(String nome);
 
-	boolean existsByName(String name);
-
-	List<Buffet> findByChef(Chef chef);
-
+	public Optional<Buffet> findByNome(String Nome);
+	
+	public List<Buffet> findAllByChef(Chef chef);
 }

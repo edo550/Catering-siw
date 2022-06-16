@@ -1,15 +1,17 @@
 package it.uniroma3.siw.catering.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
-
 
 @Entity
 public class Buffet {
@@ -18,31 +20,21 @@ public class Buffet {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@NotBlank
-	private String name;
-	@NotBlank
-	private String description;
-
 	@ManyToOne
 	private Chef chef;
 
-	@ManyToMany
-	private List<Dish> offeredDishes;
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "id_buffet")
+	private List<Piatto> piatti;
 
-	
-	
-	
-	public Buffet(Long id,  String name,  String description, Chef chef, List<Dish> offeredDishes) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.chef = chef;
-		this.offeredDishes = offeredDishes;
-	}
+	@NotBlank
+	private String nome;
 
+	@NotBlank
+	private String descrizione;
+	
 	public Buffet() {
-		// TODO Auto-generated constructor stub
+		this.piatti = new ArrayList<Piatto>();
 	}
 
 	public Long getId() {
@@ -53,22 +45,6 @@ public class Buffet {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public Chef getChef() {
 		return chef;
 	}
@@ -77,14 +53,27 @@ public class Buffet {
 		this.chef = chef;
 	}
 
-	public List<Dish> getOfferedDishes() {
-		return offeredDishes;
+	public List<Piatto> getPiatti() {
+		return piatti;
 	}
 
-	public void setOfferedDishes(List<Dish> offeredDishes) {
-		this.offeredDishes = offeredDishes;
+	public void setPiatti(List<Piatto> piatti) {
+		this.piatti = piatti;
 	}
-	
-	
 
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getDescrizione() {
+		return descrizione;
+	}
+
+	public void setDescrizione(String descrizione) {
+		this.descrizione = descrizione;
+	}
 }

@@ -2,19 +2,15 @@ package it.uniroma3.siw.catering.model;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 
-
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(name = "UniqueNameAndNationality", columnNames = { "firstName",
-		"lastName", "nationality" }) })
 public class Chef {
 
 	@Id
@@ -22,39 +18,16 @@ public class Chef {
 	private Long id;
 
 	@NotBlank
-	private String firstName;
+	private String nome;
+
 	@NotBlank
-	private String lastName;
+	private String cognome;
+
 	@NotBlank
-	private String nationality;
+	private String nazionalita;
 
-	@OneToMany(mappedBy = "chef")
-	private List<Buffet> offeredBuffets;
-
-	/*
-	 * @ElementCollection
-	 * 
-	 * @NotEmpty private List<Long> offeredBuffets;
-	 */
-	
-	@Override
-	public String toString() {
-		return id + " " + firstName + " " + lastName + ", " + nationality;
-	}
-
-	public Chef(Long id, String firstName, String lastName, String nationality,
-			List<Buffet> offeredBuffets) {
-		super();
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.nationality = nationality;
-		this.offeredBuffets = offeredBuffets;
-	}
-
-	public Chef() {
-		// TODO Auto-generated constructor stub
-	}
+	@OneToMany(mappedBy = "chef", cascade = CascadeType.ALL)
+	private List<Buffet> buffet;
 
 	public Long getId() {
 		return id;
@@ -64,35 +37,35 @@ public class Chef {
 		this.id = id;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getCognome() {
+		return cognome;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setCognome(String cognome) {
+		this.cognome = cognome;
 	}
 
-	public String getNationality() {
-		return nationality;
+	public String getNazionalita() {
+		return nazionalita;
 	}
 
-	public void setNationality(String nationality) {
-		this.nationality = nationality;
+	public void setNazionalita(String nazionalita) {
+		this.nazionalita = nazionalita;
 	}
 
-	public List<Buffet> getOfferedBuffets() {
-		return offeredBuffets;
+	public List<Buffet> getBuffet() {
+		return buffet;
 	}
 
-	public void setOfferedBuffets(List<Buffet> offeredBuffets) {
-		this.offeredBuffets = offeredBuffets;
+	public void setBuffet(List<Buffet> buffet) {
+		this.buffet = buffet;
 	}
 }

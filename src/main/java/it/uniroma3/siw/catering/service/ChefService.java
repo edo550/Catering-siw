@@ -2,6 +2,7 @@ package it.uniroma3.siw.catering.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,46 +15,41 @@ import it.uniroma3.siw.catering.repository.ChefRepository;
 public class ChefService {
 
 	@Autowired
-	private ChefRepository chefRepository;
+	private ChefRepository chrepo;
 
 	@Transactional
-	public Chef inserisci(Chef chef) {
-		return chefRepository.save(chef);
-	}
-
-	@Transactional
-	public void save(Chef chef) {
-		chefRepository.save(chef);
-	}
-
-	public Chef search(String firstName, String lastName) {
-		return chefRepository.findByFirstNameAndLastName(firstName, lastName);
-	}
-
-	public List<Chef> searchByFirstOrLastName(String firstName, String lastName) {
-		return chefRepository.findByFirstNameOrLastName(firstName, lastName);
-	}
-
-	public boolean hasDuplicate(Chef chef) {
-		return chefRepository.existsByFirstNameAndLastName(chef.getFirstName(), chef.getFirstName());
-	}
-
-	public Chef findById(Long id) {
-		var p = chefRepository.findById(id);
-		if (p.isPresent())
-			return p.get();
-		return null;
+	public Chef save(Chef chef) {
+		return chrepo.save(chef);
 	}
 
 	@Transactional
-	public void deleteChefById(Long id) {
-		chefRepository.deleteById(id);
+	public void delete(Long id) {
+		this.chrepo.deleteById(id);
 	}
 
-	public List<Chef> findAll() {
-		List<Chef> l = new ArrayList<>();
-		for (Chef i : chefRepository.findAll())
-			l.add(i);
-		return l;
+	public boolean alreadyExists(Chef target) {
+		return this.chrepo.existsByNomeAndCognomeAndNazionalita(target.getNome(), target.getCognome(),
+				target.getNazionalita());
+	}
+
+	public Optional<Chef> findById(Long id) {
+		return this.chrepo.findById(id);
+	}
+
+	public List<Chef> findAllChef() {
+		List<Chef> tuttiChef = new ArrayList<Chef>();
+
+		for (Chef c : chrepo.findAll()) {
+			tuttiChef.add(c);
+		}
+
+		return tuttiChef;
+	}
+
+	public void update(Chef chef, Chef newChef) {
+		chef.setNome(newChef.getNome());
+		chef.setCognome(newChef.getCognome());
+		chef.setNazionalita(newChef.getNazionalita());
+		this.chrepo.save(chef);
 	}
 }

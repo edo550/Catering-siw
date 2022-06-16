@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+	<link href="/css/newPiattoStyle.css" rel="stylesheet">
+	<meta name"viewport" content="width=device-width, initial-scale=1">
+	<title>Catering nuovo piatto</title>
+</head>
+<body>
+	<header th:fragment="navbar" class="container-menu">
+		<nav class="fixed-top navbar navbar-expand-lg navbar_dark">
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+				aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon nav"></span>
+			</button>
+
+			<div class="navbar_brand">
+				<a th:href="@{/}">Catering</a>
+			</div>
+		</nav>
+	</header>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<div align="center" class="title">
+		<h1>Aggiungi un Piatto al Buffet</h1>
+	</div>
+	<div class="logincontainer">
+		<div class="itemLogin">
+			<form th:action="@{/buffet} + '/' + ${buffet.id} + @{/aggiungiPiatto}" method="post">
+				<div>
+					<input type="text" placeholder="Nome" required th:field="${piatto.nome}" />
+					<!-- <span th:if="${#fields.hasErrors('piatto.nome')}" th:errors="${piatto.nome}"></span> -->
+				</div>
+				<div>
+					<input type="text" placeholder="Descrizione" required th:field="${piatto.descrizione}" />
+					<!-- <span th:if="${#fields.hasErrors('piatto.descrizione')}" th:errors="${piatto.descrizione}"></span> -->
+				</div>
+				<div>
+					<button class="loginbutton" type="submit">Conferma</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<footer>
+		<section id="foot" class="container-fluid" th:fragment="contatti">
+			<div class="container">
+
+				<div class="title">
+					<h1>Per maggiori info</h1>
+				</div>
+				<div class="row">
+					<div class="col col-md-5 contattiText">
+						Via Carlo del prete 5, 04100, Latina<br>
+						<a href="mailto:edo.craia@stud.uniroma3.it">edo.craia@stud.uniroma3.it</a>
+						<br>Cell.: +393386343160<br>
+						<br>Fax: 0773123456<br>
+					</div>
+					<div class="col col-sm-2">
+						<div class="divider dividerContatti"></div>
+					</div>
+					<div class="col col-md-5">
+						<iframe
+							src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2990.484980404025!2d12.923751715823888!3d41.450395479258525!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13250c414c2130e3%3A0xc92638d95770a3aa!2sStr.%20C.%20del%20prete%2C%205%2C%2004100%20Latina%20LT!5e0!3m2!1sit!2sit!4v1655045692014!5m2!1sit!2sit"
+							width="760" height="250" style="border:0;" allowfullscreen="" loading="lazy"
+							referrerpolicy="no-referrer-when-downgrade"></iframe>
+					</div>
+				</div>
+			</div>
+		</section>
+	</footer>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/base.html :: headerfiles(title='Chef')"></head>
+<link href="/css/chef.css" rel="stylesheet">
+<meta name"viewport" content="width=device-width, initial-scale=1">
+
+<body>
+	<header th:fragment="navbar" class="container-menu">
+		<nav class="fixed-top navbar navbar-expand-lg navbar_dark">
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+				aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon ic"></span>
+			</button>
+			<div class="navbar_brand">Catering</div>
+			<div class="collapse navbar-collapse" id="navbarNavDropdown">
+				<ul class="navbar-nav marginBox">
+					<li class="nav-item">
+						<a class="nav_link" th:href="@{/}">Home</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav_link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false">
+							I nostri Chef
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+							<a class="dropdown-item" th:each="chef : ${chefs}" th:href="@{'/chef' + '/' + ${chef.id}}"
+								th:text="${chef.nome} + ' ' + ${chef.cognome}"></a>
+						</div>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav_link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="false">
+							Buffet
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+							<a class="dropdown-item" th:each="buffet : ${buffetList}"
+								th:href="@{'/buffet' + '/' + ${buffet.id}}" th:text="${buffet.nome}"></a>
+						</div>
+					</li>
+					<li class="nav-item">
+						<a class="nav_link" href="#foot">Info</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a sec:authorize="hasAuthority('ADMIN')" class="nav_link dropdown-toggle" href="#"
+							id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							Admin
+						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+							<a class="dropdown-item" th:href="@{/aggiungiChef}">Aggiungi Chef</a>
+							<a class="dropdown-item" th:href="@{/modificaChef} + '/' + ${chef.id}">Modifica Chef</a>
+							<a class="dropdown-item" th:href="@{{/deleteChef} + '/' + ${chef.id}}">Elimina</a>
+							<a class="dropdown-item" th:href="@{/chef} + '/' + ${chef.id} + @{/aggiungiBuffet}">Aggiungi
+								Buffet</a>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="collapse navbar-collapse">
+				<div class="nav-item navButton">
+					<a sec:authorize="!isAuthenticated()" class="btn btn-outline-success my-2 my-sm-0 LoginButton1"
+						th:href=@{/login}>Login</a>
+					<a sec:authorize="!isAuthenticated()" class="btn btn-outline-info my-2 my-sm-0 RegisterButton2"
+						th:href=@{/register}>Register</a>
+					<a sec:authorize="isAuthenticated()" class="btn btn-outline-success my-2 my-sm-0 LogoutButton3"
+						th:href=@{/logout}>Logout</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<div class="titolo">
+		<div style="text-align: center;">
+			<span class="nome" th:text="${chef.nome} + ' ' + ${chef.cognome}"></span>
+		</div>
+		<div class="descrizione1">
+			<span><i>Chef Stellato di nazionalita'</i></span>
+			<span style="font-style: italic" th:text="${chef.nazionalita}"></span>
+			<span><i>appartenente al nostro Catering.</i></span>
+		</div>
+	</div>
+	<div class="descrizione">
+		<div class="container">
+			<div class="row">
+				<div class="col col-lg-4" style="padding-top:20px; padding-bottom:30px"
+					th:each="buffet: ${chef.buffet}">
+					<div class="card p-3" style="opacity: 0.9; border-radius: 30px;">
+						<div class="card-header border-0 rounded-0 bg-white">
+							<script> var ran = new Array(); //array dell'immagine
+								ran[0] = "<img src=\"/images/Buffet/1Buffet.jpg\" class=\"card-img-top random\">";
+								ran[1] = "<img src=\"/images/Buffet/2Buffet.jpg\" class=\"card-img-top random\">";
+								ran[2] = "<img src=\"/images/Buffet/3Buffet.jpg\" class=\"card-img-top random\">";
+								ran[3] = "<img src=\"/images/Buffet/4Buffet.jpg\" class=\"card-img-top random\">";
+
+								var id = Math.round(Math.random() * (ran.length - 1)); //prende una delle immagini che abbiamo scelto
+
+								document.write("" + ran[id] + ""); //mostra l'immagine random
+
+							</script>
+						</div>
+						<div class="card-body">
+							<h5 class="card-title" style="text-align: center; font-weight:bold"
+								th:text="${buffet.nome}"></h5>
+							<p class="card-text" th:text="${buffet.descrizione}"></p>
+							<a style="text-decoration:underline; color:#a92222" th:href="@{'/buffet' + '/' + ${buffet.id}}">Visualizza Buffet</a>
+						</div>
+						<div sec:authorize="hasAuthority('ADMIN')" class="card-footer bg-dark rounded">
+							<div class="container p-0 d-flex justify-content-center align-items-center">
+								<div class="row m-0 d-flex justify-content-center align-items-center">
+									<div class="nav-item navButton" style="margin-bottom: 40px;">
+										<a class="btn btn-outline-success my-2 my-sm-0 Button1" th:href="@{'/modificaBuffet' + '/' + ${buffet.id}}">Modifica</a>
+									</div>
+									<div class="nav-item navButton" style="margin-bottom: 40px;">
+										<a class="btn btn-outline-success my-2 my-sm-0 Button2" th:href="@{'/eliminaBuffet' + '/' + ${buffet.id}}">Elimina</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<section th:replace="fragments/base.html :: contatti"></section>
+	<div th:replace="fragments/base.html :: script"></div>
+</body>
+
+</html>

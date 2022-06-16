@@ -1,8 +1,11 @@
 package it.uniroma3.siw.catering.controller;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,115 +13,96 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.validation.Valid;
-import java.util.List;
-
+import it.uniroma3.siw.catering.controller.validator.BuffetValidator;
 import it.uniroma3.siw.catering.model.Buffet;
+import it.uniroma3.siw.catering.model.Chef;
 import it.uniroma3.siw.catering.service.BuffetService;
 import it.uniroma3.siw.catering.service.ChefService;
-import it.uniroma3.siw.catering.service.DishService;
-import it.uniroma3.siw.catering.validator.BuffetValidator;
 
 @Controller
 public class BuffetController {
 
 	@Autowired
-	private BuffetService buffetService;
+	private BuffetService bfs;
 
 	@Autowired
-	private DishService dishService;
+	private BuffetValidator bfv;
 
 	@Autowired
-	private ChefService chefService;
+	private ChefService cs;
 
-	@Autowired
-	private BuffetValidator buffetValidator;
-
-	@GetMapping("/buffets")
-	public String getAllBuffets(Model model) {
-		List<Buffet> buffets = buffetService.findAll();
-		model.addAttribute("buffets", buffets);
-		String nextPage = "buffets.html";
-		return nextPage;
-	}
-
-	@GetMapping("/buffetForm")
-	public String getBuffetForm(Model model) { // NON FUNZIONA
-		model.addAttribute("buffet", new Buffet());
-		model.addAttribute("chefsList", chefService.findAll());
-		model.addAttribute("dishesList", dishService.findAll());
-		String nextPage = "buffetForm.html";
-		return nextPage;
-	}
-
-	@PostMapping("/buffet")
-	public String newBuffet(@Valid @ModelAttribute("buffet") Buffet buffet, BindingResult bindingResult, Model model) {
-		this.buffetValidator.validate(buffet, bindingResult);
-		String nextPage;
-		if (!bindingResult.hasErrors()) { // se i dati sono corretti
-			this.buffetService.save(buffet); // salvo un oggetto Buffet
-			model.addAttribute("buffet", buffet);
-			nextPage = "buffet.html"; // presenta un pagina con la buffet appena salvata
-		} else {
-			model.addAttribute("dishesList", dishService.findAll());
-			model.addAttribute("chefsList", chefService.findAll());
-			nextPage = "buffetForm.html"; // ci sono errori, torna alla form iniziale
-		}
-		return nextPage;
+	@GetMapping("/elencoBuffet")
+	public String getBuffetList(Model model) {
+		List<Buffet> list = this.bfs.findAll();
+		model.addAttribute("buffetList", list);
+		return "buffet/allBuffet.html";
 	}
 
 	@GetMapping("/buffet/{id}")
 	public String getBuffet(@PathVariable("id") Long id, Model model) {
-		Buffet d = this.buffetService.findById(id);
-		model.addAttribute("buffet", d);
-		model.addAttribute("buffetDishesList", d.getOfferedDishes());
-		String nextPage = "buffet.html";
-		return nextPage;
+		Buffet buffet = this.bfs.findById(id).get();
+		model.addAttribute("buffet", buffet);
+		return "buffet/buffet.html";
+	}
+	
+	//Modifica buffet di uno chef
+	@GetMapping("/modificaBuffet/{idBuffet}")
+	public String editBuffet(@PathVariable("idBuffet") Long idBuffet, Model model) {
+		Buffet buffet = this.bfs.findById(idBuffet).get();
+		model.addAttribute("buffet", buffet);
+		return "buffet/modificaBuffet.html";
 	}
 
-	@GetMapping("/editBuffetForm/{id}")
-	public String getBuffetForm(@PathVariable Long id, Model model) {
-		model.addAttribute("buffet", buffetService.findById(id));
-		model.addAttribute("chefsList", chefService.findAll());
-		model.addAttribute("dishesList", dishService.findAll());
-		String nextPage = "editBuffetForm.html";
-		return nextPage;
-	}
-
-	@Transactional
-	@PostMapping("/edit/buffet/{id}")
-	public String editBuffet(@PathVariable Long id, @Valid @ModelAttribute("buffet") Buffet buffet,
-			BindingResult bindingResults, Model model) {
-		String nextPage;
-		if (!bindingResults.hasErrors()) {
-			Buffet oldBuffet = buffetService.findById(id);
-			oldBuffet.setId(buffet.getId());
-			oldBuffet.setName(buffet.getName());
-			oldBuffet.setDescription(buffet.getDescription());
-			oldBuffet.setChef(buffet.getChef());
-			oldBuffet.setOfferedDishes(buffet.getOfferedDishes());
-			this.buffetService.save(oldBuffet);
-			model.addAttribute("buffet", buffet);
-			nextPage = "buffet.html"; // presenta un pagina con la buffet appena salvata
-		} else {
-			model.addAttribute("dishesList", dishService.findAll());
-			model.addAttribute("chefsList", chefService.findAll());
-			nextPage = "editBuffetForm.html"; // ci sono errori, torna alla form iniziale
+	//Form modifica buffet di uno chef
+	@PostMapping("/modificaBuffet/{idBuffet}")
+	public String editBuffet(@PathVariable("idBuffet") Long idBuffet, @Valid @ModelAttribute Buffet newBuffet,
+			BindingResult buffetBindingResult, Model model) {
+		Buffet buffet = this.bfs.findById(idBuffet).get();
+		this.bfv.validate(newBuffet, buffetBindingResult);
+		if (!buffetBindingResult.hasErrors()) {
+			this.bfs.update(buffet, newBuffet);
+			List<Buffet> buffetList = this.bfs.findAll();
+			model.addAttribute("chef", buffet.getChef());
+			model.addAttribute("buffetList", buffetList);
+			return "chef/chef.html";
 		}
-		return nextPage;
+		return "buffet/modificaBuffet.html";
 	}
 
-	@PostMapping("/remove/ask/buffet/{id}")
-	public String askRemoveBuffetById(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("buffet", this.buffetService.findById(id));
-		String nextPage = "buffetConfirmDelete.html";
-		return nextPage;
+	//Aggiungi buffet di uno chef
+	@GetMapping("/chef/{id}/aggiungiBuffet")
+	public String newBuffet(@PathVariable("id") Long id, Model model) {
+		Chef chef = this.cs.findById(id).get();
+		model.addAttribute("chef", chef);
+		model.addAttribute("buffet", new Buffet());
+		return "buffet/newBuffet.html";
 	}
 
-	@PostMapping("/remove/confirm/buffet/{id}")
-	public String confirmRemoveBuffetById(@PathVariable("id") Long id, Model model) {
-		this.buffetService.deleteBuffetById(id);
-		String nextPage = "success.html";
-		return nextPage;
+	//Form per aggiungere un buffet di uno chef
+	@PostMapping("/chef/{id}/aggiungiBuffet")
+	public String newBuffet(@Valid @ModelAttribute Buffet buffet, BindingResult buffetBindingResult,
+			@PathVariable("id") Long id, Model model) {
+
+		Chef chef = cs.findById(id).get();
+		bfv.validate(buffet, buffetBindingResult);
+		if (!buffetBindingResult.hasErrors()) {
+			buffet.setChef(chef);
+			chef.getBuffet().add(buffet);
+			cs.save(chef);
+			model.addAttribute("chef", chef);
+			model.addAttribute("buffetList", chef.getBuffet());
+			return "chef/chef.html";
+		}
+		return "buffet/newBuffet.html";
+	}
+
+	//Elimina un buffet di uno chef
+	@GetMapping("/eliminaBuffet/{idBuffet}")
+	public String deleteBuffet(@PathVariable("idBuffet") Long idBuffet, Model model) {
+		Buffet buffet = this.bfs.findById(idBuffet).get();
+		this.bfs.delete(buffet);
+		model.addAttribute("chef", buffet.getChef());
+		model.addAttribute("buffetList", buffet.getChef().getBuffet());
+		return "chef/chef.html";
 	}
 }
